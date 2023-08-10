@@ -1,0 +1,10 @@
+.class-display {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.class-display li {
+  padding: 10px;
+  margin: 10px;
+}

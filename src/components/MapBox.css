@@ -1,0 +1,9 @@
+.marker {
+  transition: all 0.3s ease 0s;
+  font-size: 1.5rem;
+}
+
+.marker-clicked, .marker:hover {
+  font-size: 2rem;
+  color: rgb(62, 62, 239);
+}
