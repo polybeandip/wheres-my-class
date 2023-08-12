@@ -1,6 +1,6 @@
 import './App.css';
 import { useState } from 'react';
-//import classes from './course-scraper';
+import classes from './course-scraper';
 import Map from './components/MapBox';
 import SearchBar from './components/SearchBar';
 import ClassDisplay from './components/ClassDisplay';
@@ -19,13 +19,26 @@ const colordict =
     "pink"
   ]
 
+/* const classes = [
+  {
+    name: 'CS 3110: Functional Programming',
+    locations: ['Uris Library', "Uris Hall"],
+    drawn_on_map: false
+  },
+  {
+    name: 'CS 3110: Not Func Programming',
+    locations: ['Amit Bhatia Libe Cafe'],
+    draw_on_map: false
+  }
+] */
+
 export default function App() {
   const [selected, setSelected] = useState([]);
 
   return (
-    <div className="App">
+    <div id="App">
       <div id="container" className="grid-expanded">
-        <div className="sidebar">
+        <div id="sidebar">
           <h1>How it works</h1>
           <p>
             What is going on here?
@@ -33,9 +46,9 @@ export default function App() {
           <ClassDisplay selected={selected} colordict={colordict} />
         </div>
         <div>
-        <div className="search">
+        <div id="search">
           <SearchBar 
-            classes={[{name: 'CS 3110: Functional Programming', location: "Uris Library", drawn_on_map: false}, {name: "CS 3111: Not Func Programming", location: "Amit Bhatia Libe Cafe", drawn_on_map: false}]} 
+            classes={classes} 
             setSelected={setSelected} 
             selected={selected}
           />

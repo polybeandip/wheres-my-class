@@ -20,8 +20,7 @@ const theta =
     11 * (Math.PI / 6)
   ];
 
-//const r = 0.0001;
-const r = 0;
+const r = 0.000025;
 
 mapboxgl.accessToken = process.env.REACT_APP_MAP_BOX_TOKEN;
 
@@ -39,10 +38,10 @@ export default function MapBox({ selected }) {
 
   function handleMarkerClick(s, centerMarker) {
     const clicked = clickedStore.getState();
-    if (!clicked.some(el => el[0] === s.name)) {
+    if (!clicked.some(el => el[0] === s.name && el[2] === s.location)) {
       clickedStore.dispatch({
         type: "setClicked", 
-        payload: clicked.concat([[s.name, centerMarker]])
+        payload: clicked.concat([[s.name, centerMarker, s.location]])
       });
     }
   }
@@ -104,8 +103,8 @@ export default function MapBox({ selected }) {
         pitch: 45,
         minZoom: 14.5,
         maxBounds: [
-          [-76.535352, 42.416727], //southwest coord
-          [-76.368175, 42.480654]  //northeast coord
+          [-76.48770, 42.436908], //southwest coord
+          [-76.45095, 42.455924]  //northeast coord
         ]
       });
     
@@ -154,7 +153,7 @@ export default function MapBox({ selected }) {
           const marker = new mapboxgl.Marker(el);
 
           function MarkerDiv() {
-            const [f, forceUpdate] = useState(true);
+            const forceUpdate = useState(true)[1];
 
             useEffect(() => {
               clickedStore.subscribe(() =>forceUpdate(f => !f));
@@ -163,7 +162,10 @@ export default function MapBox({ selected }) {
             const clicked = clickedStore.getState();
             return (
               <div 
-                className={clicked.some(el => el[0] === s.name) ? "marker-clicked" : "marker"} 
+                className={
+                  clicked.some(el => el[0] === s.name && el[2] === s.location) ? 
+                  "marker-clicked" : "marker"
+                } 
                 onClick={async () => {
                   handleMarkerClick(s, centerMarker); 
                   drawPath();

@@ -1,27 +1,53 @@
 import './SearchBar.css';
 import { useState } from 'react';
 import { FaSearchLocation } from 'react-icons/fa';
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 
-function SearchResults({ results, setSelected, selected }) {
+function SearchResults({ results, setSelected, selected, setResults }) {
   function contains(lst, obj) {
-    return lst.some(elem => { return obj.name === elem.name; });
+    return lst.some(elem => {
+      return (
+        elem.name === obj.name &&
+        elem.location === obj.location &&
+        elem.room === obj.room
+      );
+    });
   } 
 
-  function handleClick(r) {
-    if (selected.length > 9 || contains(selected,r)) return;
-    setSelected(selected.concat(r));
+  function handleClick(r, showArrow) {
+    if (!showArrow) {
+      let c;
+      console.log(r);
+      if (r.class) {c = {...r.class, room: r.room}}
+      else {c = {...r, room: r.locations[0].room}}
+      c = {...c, location: r.locations[0].bldg, drawn_on_map: false};
+      if (selected.length > 9 || contains(selected,c)) return;
+      setSelected(selected.concat(c));
+      console.log(c);
+    }
+    else {
+      const newResults = r.locations.map(l => {return {
+        name: l.room + " (" + l.type + ")",
+        locations: [l],
+        room: l.room,
+        class: r
+      }});
+      setResults(newResults);
+    }
   }
 
   const lis = results.map((r) => {
+    const showArrow = r.locations.length > 1;
     return (
-      <li key={r.name} onClick={() => handleClick(r)}>
+      <li key={r.name} onClick={() => handleClick(r, showArrow)}>
         <div>{r.name}</div>
+        {showArrow && <div><MdOutlineKeyboardArrowRight /></div>}
       </li>
     );
   });
 
   return (
-    <div className="results-container">
+    <div id="results-container">
       <ul>
         {lis}
       </ul>
@@ -47,7 +73,7 @@ export default function SearchBar({ classes, setSelected, selected }) {
 
   return (
     <div>
-      <div className="bar-container">
+      <div id="bar-container">
         <div id="spotlight">
           <FaSearchLocation />
         </div>
@@ -60,6 +86,7 @@ export default function SearchBar({ classes, setSelected, selected }) {
         results={results} 
         setSelected={setSelected} 
         selected={selected}
+        setResults={setResults}
       />
     </div>
   );

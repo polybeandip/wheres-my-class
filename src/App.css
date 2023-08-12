@@ -9,13 +9,11 @@ h1 {
   margin: 10px 0px;
 }
 
-
-
-.App {
+#App {
   height: 100vh;
 }
 
-.sidebar {
+#sidebar {
   padding: 10px;
 }
 
@@ -25,7 +23,7 @@ h1 {
   grid-template-columns: 1fr 4fr;
 }
 
-.search {
+#search {
   left:50%;
   margin-left:-10rem;
   top: 10px;

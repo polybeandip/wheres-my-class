@@ -1,7 +1,10 @@
 import './ClassDisplay.css'
 
 export default function ClassDisplay({ selected }) {
-  const lis = selected.map(x => <li key={x.name}>{x.name}</li>)
+  const lis = selected.map(x => {
+    const key = x.name +", " + x.location + ", " + x.room;
+    return <li key={key}>{x.name}</li>
+  });
   return (
   <div>
     <h1>Classes</h1>
