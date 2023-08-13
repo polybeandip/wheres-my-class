@@ -17,13 +17,14 @@ function SearchResults({ results, setSelected, selected, setResults }) {
   function handleClick(r, showArrow) {
     if (!showArrow) {
       let c;
-      console.log(r);
       if (r.class) {c = {...r.class, room: r.room}}
       else {c = {...r, room: r.locations[0].room}}
       c = {...c, location: r.locations[0].bldg, drawn_on_map: false};
-      if (selected.length > 9 || contains(selected,c)) return;
+      const key = c.name + ", " + c.location + ", " + c.room;
+      c = {...c, key: key};
+      if (selected.length > 7 || contains(selected,c)) return;
       setSelected(selected.concat(c));
-      console.log(c);
+      setResults([]);
     }
     else {
       const newResults = r.locations.map(l => {return {

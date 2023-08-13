@@ -1,8 +1,8 @@
 import './MapBox.css';
 import ReactDOM from 'react-dom/client';
 import { useState, useRef, useEffect } from 'react';
-import { FaMapMarkerAlt } from 'react-icons/fa';
-import clickedStore from "../clickedStore";
+import { MdSchool } from 'react-icons/md';
+import { clickedStore, divStore }from '../stores';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -24,7 +24,7 @@ const r = 0.000025;
 
 mapboxgl.accessToken = process.env.REACT_APP_MAP_BOX_TOKEN;
 
-export default function MapBox({ selected }) {
+export default function MapBox({ selected, setSelected, colordict }) {
   //for the map
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -41,12 +41,12 @@ export default function MapBox({ selected }) {
     if (!clicked.some(el => el[0] === s.name && el[2] === s.location)) {
       clickedStore.dispatch({
         type: "setClicked", 
-        payload: clicked.concat([[s.name, centerMarker, s.location]])
+        payload: clicked.concat([[s.name, centerMarker, s.location, s.room]])
       });
     }
   }
 
-  function drawPath() {
+  async function drawPath() {
     const clicked = clickedStore.getState();
 
     if(clicked.length < 2) return;
@@ -60,43 +60,41 @@ export default function MapBox({ selected }) {
       "&overview=full" + 
       "&access_token=" + mapboxgl.accessToken;
 
-    fetch(url)
-      .then(res => res.json())
-      .then(res => {
-        const label = clicked[0][0] + " to " + clicked[1][0];
-        map.current.addSource(label, {
-          'type': 'geojson',
-          'data': {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': res.routes[0].geometry
-          }
-        });
+    const resp = await fetch(url);
+    const res = await resp.json();
 
-        map.current.addLayer({
-          'id': label,
-          'type': 'line',
-          'source': label,
-          'layout': {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          'paint': {
-            'line-color': '#888',
-            'line-width': 8
-          }
-        });
+    const label = clicked[0][0] + " to " + clicked[1][0];
+    map.current.addSource(label, {
+      'type': 'geojson',
+      'data': {
+        'type': 'Feature',
+        'properties': {},
+        'geometry': res.routes[0].geometry
+      }
+    });
 
-        clickedStore.dispatch({type: "setClicked", payload: []});
-      })
+    map.current.addLayer({
+      'id': label,
+      'type': 'line',
+      'source': label,
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      'paint': {
+        'line-color': '#6464ff',
+        'line-width': 8
+      }
+    });
 
+    clickedStore.dispatch({type: "setClicked", payload: []});
   }
 
   useEffect(() => {
     if (!map.current) { //init map only once
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mapbox/streets-v12",
+        style: "mapbox://styles/polybeandip/cll8k7mvf00b101po9jsfdcyz",
         attributionControl: false,
         center: [lng, lat],
         zoom: zoom,
@@ -124,7 +122,8 @@ export default function MapBox({ selected }) {
       map.current.resize();
     }
 
-    for (const s of selected) {
+    
+    for (const [index,s] of selected.entries()) {
       if (s.drawn_on_map) continue;
       s.drawn_on_map = true;
 
@@ -154,24 +153,43 @@ export default function MapBox({ selected }) {
 
           function MarkerDiv() {
             const forceUpdate = useState(true)[1];
+            const clicked = clickedStore.getState();
+
+            async function handleClick() {
+              handleMarkerClick(s, centerMarker);
+              await drawPath();
+            }
+
+            function removeMarker() {
+              marker.remove();
+              setSelected(selected.filter(e => e != s));
+              clickedStore.dispatch({
+                type: "setClicked",
+                payload: clicked.filter(e => e[0] != s.name || e[2] != s.location || e[3] != s.room)
+              });
+            }
 
             useEffect(() => {
-              clickedStore.subscribe(() =>forceUpdate(f => !f));
+              clickedStore.subscribe(() => forceUpdate(f => !f));
+              const divMap = divStore.getState();
+              console.log(divMap);
+              divStore.dispatch({
+                type: "setDivMap",
+                payload: {...divMap, [s.key]: [handleClick, removeMarker]}
+              });
             }, []);
 
-            const clicked = clickedStore.getState();
             return (
               <div 
                 className={
-                  clicked.some(el => el[0] === s.name && el[2] === s.location) ? 
-                  "marker-clicked" : "marker"
+                  clicked.some(el => 
+                    el[0] === s.name && el[2] === s.location && el[3] === s.room) 
+                  ? "marker-clicked" : "marker"
                 } 
-                onClick={async () => {
-                  handleMarkerClick(s, centerMarker); 
-                  drawPath();
-                }}
+                onClick={async () => await handleClick()}
+                style={{color: colordict[index]}}
               >
-                <FaMapMarkerAlt />
+                <MdSchool />
               </div>
             );
           }

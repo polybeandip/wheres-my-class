@@ -1,3 +1,6 @@
+const loadingPara = document.getElementById("loading");
+const loadingBar = document.getElementById("bar");
+
 const rosterURL = "https://classes.cornell.edu/api/2.0/config/rosters.json";
 const rosterResponse = (await fetch(rosterURL));
 const rosterJSON = await rosterResponse.json();
@@ -9,24 +12,27 @@ const subjectsJSON = await subjectsResponse.json();
 const subjects = subjectsJSON.data.subjects;
  
 const classesJSON = [];
+let count = 0; const total = subjects.length;
 for (const s of subjects) {
-  console.log("Loading " + s.value + " classes");
+  count++;
+  loadingPara.innerHTML = "Loading " + s.value + " classes";
+  loadingBar.innerHTML = count + "/" + total;
   const classURL = "https://classes.cornell.edu/api/2.0/search/classes.json?roster=FA23&subject=" + s.value;
-  console.log(classURL);
   const classResponse = await fetch(classURL);
   const classJSON = await classResponse.json();
   classesJSON.push(...classJSON.data.classes);
 }
-console.log("All done!");
+loadingPara.innerHTML = "All done!";
 
 const classes = []
 for (const c of classesJSON) {
   const item = {
+    code: c.subject + " " + c.catalogNbr,
+    title: c.titleLong,
     name: c.subject + " " + c.catalogNbr + ": " + c.titleLong,
     desc: c.description,
     locations: [],
   }
-  classes.push(item);
   for (const e of c.enrollGroups) {
     for (const s of e.classSections) {
       for (const m of s.meetings) {
@@ -35,12 +41,16 @@ for (const c of classesJSON) {
           room: m.facilityDescr,
           type: s.ssrComponent
         }
-        if (!item.locations.some(el => el.bldg === place.bldg && el.room === place.room)) {
+        if (!place.bldg) continue;
+        if (!item.locations.some(el => 
+          el.bldg === place.bldg && el.room === place.room
+        )) {
           item.locations.push(place);
         }
       }
     }
   }
+  if (item.locations.length > 0) {classes.push(item);}
 }
 
 export default classes;

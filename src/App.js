@@ -21,14 +21,18 @@ const colordict =
 
 /* const classes = [
   {
+    code: 'CS 3110',
+    title: 'Functional Programming',
     name: 'CS 3110: Functional Programming',
-    locations: ['Uris Library', "Uris Hall"],
-    drawn_on_map: false
+    desc: 'reee',
+    locations: [{bldg: 'Uris Library', room: 'Uris 104', type:'LEC'}, {bldg: 'Uris Hall', room: 'Uris 105', type:'LEC'}],
   },
   {
-    name: 'CS 3110: Not Func Programming',
-    locations: ['Amit Bhatia Libe Cafe'],
-    draw_on_map: false
+    code: 'CS 3111',
+    title: 'Not Func Programming and other shit homie',
+    name: 'CS 3111: Not Func Programming',
+    desc: 'REEEEEE',
+    locations: [{bldg: 'Albert R Mann Library', room: 'Mann 105', type:'LEC'}],
   }
 ] */
 
@@ -43,7 +47,11 @@ export default function App() {
           <p>
             What is going on here?
           </p>
-          <ClassDisplay selected={selected} colordict={colordict} />
+          <ClassDisplay 
+            selected={selected} 
+            setSelected={setSelected}
+            colordict={colordict} 
+          />
         </div>
         <div>
         <div id="search">
@@ -53,7 +61,11 @@ export default function App() {
             selected={selected}
           />
         </div>
-        <Map selected={selected}/>
+        <Map 
+          selected={selected} 
+          setSelected={setSelected}
+          colordict={colordict} 
+        />
         </div>
       </div>
     </div>
