@@ -1,6 +1,6 @@
 import './MapBox.css';
 import ReactDOM from 'react-dom/client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useReducer } from 'react';
 import { MdSchool } from 'react-icons/md';
 import { clickedStore, divStore }from '../stores';
 import mapboxgl from 'mapbox-gl';
@@ -24,7 +24,7 @@ const r = 0.000025;
 
 mapboxgl.accessToken = process.env.REACT_APP_MAP_BOX_TOKEN;
 
-export default function MapBox({ selected, setSelected, colordict }) {
+export default function MapBox({ selected, setSelected }) {
   //for the map
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -46,7 +46,7 @@ export default function MapBox({ selected, setSelected, colordict }) {
     }
   }
 
-  async function drawPath() {
+  function drawPath() {
     const clicked = clickedStore.getState();
 
     if(clicked.length < 2) return;
@@ -58,36 +58,40 @@ export default function MapBox({ selected, setSelected, colordict }) {
       start[0] + "," +start[1] + ";" +stop[0] + "," + stop[1] +
       "?geometries=geojson" + 
       "&overview=full" + 
+      "&steps=true"+
       "&access_token=" + mapboxgl.accessToken;
 
-    const resp = await fetch(url);
-    const res = await resp.json();
+    console.log(url);
 
-    const label = clicked[0][0] + " to " + clicked[1][0];
-    map.current.addSource(label, {
-      'type': 'geojson',
-      'data': {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': res.routes[0].geometry
-      }
-    });
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
+        const label = clicked[0][0] + " to " + clicked[1][0];
+        map.current.addSource(label, {
+          'type': 'geojson',
+          'data': {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': res.routes[0].geometry
+          }
+        });
 
-    map.current.addLayer({
-      'id': label,
-      'type': 'line',
-      'source': label,
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-      },
-      'paint': {
-        'line-color': '#6464ff',
-        'line-width': 8
-      }
-    });
+        map.current.addLayer({
+          'id': label,
+          'type': 'line',
+          'source': label,
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': '#6464ff',
+            'line-width': 8
+          }
+        });
 
-    clickedStore.dispatch({type: "setClicked", payload: []});
+        clickedStore.dispatch({type: "setClicked", payload: []});
+      });
   }
 
   useEffect(() => {
@@ -123,7 +127,7 @@ export default function MapBox({ selected, setSelected, colordict }) {
     }
 
     
-    for (const [index,s] of selected.entries()) {
+    for (const s of selected) {
       if (s.drawn_on_map) continue;
       s.drawn_on_map = true;
 
@@ -152,27 +156,27 @@ export default function MapBox({ selected, setSelected, colordict }) {
           const marker = new mapboxgl.Marker(el);
 
           function MarkerDiv() {
-            const forceUpdate = useState(true)[1];
+            const forceUpdate = useReducer(x => x + 1, 0)[1];
             const clicked = clickedStore.getState();
 
-            async function handleClick() {
+            function handleClick() {
               handleMarkerClick(s, centerMarker);
-              await drawPath();
+              drawPath();
             }
 
             function removeMarker() {
+              const clicked = clickedStore.getState();
               marker.remove();
-              setSelected(selected.filter(e => e != s));
+              setSelected(selected => selected.filter(e => e.key !== s.key));
               clickedStore.dispatch({
                 type: "setClicked",
-                payload: clicked.filter(e => e[0] != s.name || e[2] != s.location || e[3] != s.room)
+                payload: clicked.filter(e => e[0] !== s.name || e[2] !== s.location || e[3] !== s.room)
               });
             }
 
             useEffect(() => {
-              clickedStore.subscribe(() => forceUpdate(f => !f));
+              clickedStore.subscribe(forceUpdate);
               const divMap = divStore.getState();
-              console.log(divMap);
               divStore.dispatch({
                 type: "setDivMap",
                 payload: {...divMap, [s.key]: [handleClick, removeMarker]}
@@ -186,8 +190,8 @@ export default function MapBox({ selected, setSelected, colordict }) {
                     el[0] === s.name && el[2] === s.location && el[3] === s.room) 
                   ? "marker-clicked" : "marker"
                 } 
-                onClick={async () => await handleClick()}
-                style={{color: colordict[index]}}
+                onClick={handleClick}
+                style={{color: s.color}}
               >
                 <MdSchool />
               </div>

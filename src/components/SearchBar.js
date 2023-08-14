@@ -3,16 +3,30 @@ import { useState } from 'react';
 import { FaSearchLocation } from 'react-icons/fa';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 
+const colors = 
+  [
+    "red",
+    "green",
+    "blue",
+    "orange",
+    "yellow",
+    "purple",
+    "violet",
+    "indigo",
+    "cyan",
+    "pink"
+  ]
+
 function SearchResults({ results, setSelected, selected, setResults }) {
   function contains(lst, obj) {
-    return lst.some(elem => {
-      return (
-        elem.name === obj.name &&
-        elem.location === obj.location &&
-        elem.room === obj.room
-      );
-    });
+    return lst.some(elem => elem.key === obj.key);
   } 
+
+  function findColor() {
+    for (const c of colors) {
+      if (!selected.some(x => x.color === c)) return c;
+    }
+  }
 
   function handleClick(r, showArrow) {
     if (!showArrow) {
@@ -23,6 +37,7 @@ function SearchResults({ results, setSelected, selected, setResults }) {
       const key = c.name + ", " + c.location + ", " + c.room;
       c = {...c, key: key};
       if (selected.length > 7 || contains(selected,c)) return;
+      c = {...c, color: findColor()};
       setSelected(selected.concat(c));
       setResults([]);
     }

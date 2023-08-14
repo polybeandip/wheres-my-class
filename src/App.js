@@ -5,20 +5,6 @@ import Map from './components/MapBox';
 import SearchBar from './components/SearchBar';
 import ClassDisplay from './components/ClassDisplay';
 
-const colordict = 
-  [
-    "red",
-    "green",
-    "blue",
-    "orange",
-    "yellow",
-    "purple",
-    "violet",
-    "indigo",
-    "cyan",
-    "pink"
-  ]
-
 /* const classes = [
   {
     code: 'CS 3110',
@@ -50,7 +36,6 @@ export default function App() {
           <ClassDisplay 
             selected={selected} 
             setSelected={setSelected}
-            colordict={colordict} 
           />
         </div>
         <div>
@@ -64,7 +49,6 @@ export default function App() {
         <Map 
           selected={selected} 
           setSelected={setSelected}
-          colordict={colordict} 
         />
         </div>
       </div>
