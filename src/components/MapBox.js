@@ -1,10 +1,11 @@
 import './MapBox.css';
+import { clickedStore, divStore, pathsStore }from '../stores';
 import ReactDOM from 'react-dom/client';
 import { useState, useRef, useEffect, useReducer } from 'react';
 import { MdSchool } from 'react-icons/md';
-import { clickedStore, divStore }from '../stores';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import locationsDict from '../locations.json';
 
 const theta = 
   [
@@ -38,21 +39,32 @@ export default function MapBox({ selected, setSelected }) {
 
   function handleMarkerClick(s, centerMarker) {
     const clicked = clickedStore.getState();
-    if (!clicked.some(el => el[0] === s.name && el[2] === s.location)) {
+    if (!clicked.some(el => el[0].key === s.key)) {
       clickedStore.dispatch({
         type: "setClicked", 
-        payload: clicked.concat([[s.name, centerMarker, s.location, s.room]])
+        payload: clicked.concat([[s, centerMarker]])
       });
     }
   }
 
   function drawPath() {
     const clicked = clickedStore.getState();
-
     if(clicked.length < 2) return;
 
     const start = clicked[0][1];
     const stop = clicked[1][1];
+    const oclass = clicked[0][0];
+    const dclass = clicked[1][0];
+    const label = oclass.name + " to " + dclass.name;
+
+    if (start.toString() === stop.toString() || map.current.getLayer(label)) {
+      clickedStore.dispatch({
+        type: "setClicked",
+        payload: []
+      });
+      return;
+    }
+
     let url = 
       "https://api.mapbox.com/directions/v5/mapbox/walking/" +
       start[0] + "," +start[1] + ";" +stop[0] + "," + stop[1] +
@@ -61,12 +73,9 @@ export default function MapBox({ selected, setSelected }) {
       "&steps=true"+
       "&access_token=" + mapboxgl.accessToken;
 
-    console.log(url);
-
     fetch(url)
       .then(res => res.json())
       .then(res => {
-        const label = clicked[0][0] + " to " + clicked[1][0];
         map.current.addSource(label, {
           'type': 'geojson',
           'data': {
@@ -90,11 +99,28 @@ export default function MapBox({ selected, setSelected }) {
           }
         });
 
+        const data = {
+          ...res.routes[0].legs[0],
+          origin: oclass,
+          destination: dclass
+        };
+
+        const invis = 
+          () => map.current.setLayoutProperty(label, 'visibility', 'none');
+
+        const vis = 
+         () => {map.current.setLayoutProperty(label, 'visibility', 'visible');}
+
+        const paths = pathsStore.getState();
+        pathsStore.dispatch({
+          type: "setPaths",
+          payload: paths.concat([[label, data, invis, vis]])
+        })
         clickedStore.dispatch({type: "setClicked", payload: []});
       });
   }
 
-  useEffect(() => {
+  async function effectFunc() {
     if (!map.current) { //init map only once
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -105,7 +131,7 @@ export default function MapBox({ selected, setSelected }) {
         pitch: 45,
         minZoom: 14.5,
         maxBounds: [
-          [-76.48770, 42.436908], //southwest coord
+          [-76.49770, 42.436908], //southwest coord
           [-76.45095, 42.455924]  //northeast coord
         ]
       });
@@ -140,76 +166,88 @@ export default function MapBox({ selected, setSelected }) {
         "&access_token=" +
         mapboxgl.accessToken;
 
-      fetch(sURL)
-        .then(res => res.json())
-        .then(res => {
-          const centerMarker = res.features[0].center;
-          let coords = centerMarker;
-          const str = centerMarker.toString();
-          let i = 0;
-          if (coordCount.has(str)) {i = coordCount.get(str);}
-          coords = [coords[0] + r * Math.sin(theta[i]), coords[1] + r * Math.cos(theta[i])];
-          const newCoordCount = new Map(coordCount).set(str, i + 1);
-          setCoordCount(newCoordCount);
-
-          const el = document.createElement("div");
-          const marker = new mapboxgl.Marker(el);
-
-          function MarkerDiv() {
-            const forceUpdate = useReducer(x => x + 1, 0)[1];
-            const clicked = clickedStore.getState();
-
-            function handleClick() {
-              handleMarkerClick(s, centerMarker);
-              drawPath();
-            }
-
-            function removeMarker() {
-              const clicked = clickedStore.getState();
-              marker.remove();
-              setSelected(selected => selected.filter(e => e.key !== s.key));
-              clickedStore.dispatch({
-                type: "setClicked",
-                payload: clicked.filter(e => e[0] !== s.name || e[2] !== s.location || e[3] !== s.room)
-              });
-            }
-
-            useEffect(() => {
-              clickedStore.subscribe(forceUpdate);
-              const divMap = divStore.getState();
-              divStore.dispatch({
-                type: "setDivMap",
-                payload: {...divMap, [s.key]: [handleClick, removeMarker]}
-              });
-            }, []);
-
-            return (
-              <div 
-                className={
-                  clicked.some(el => 
-                    el[0] === s.name && el[2] === s.location && el[3] === s.room) 
-                  ? "marker-clicked" : "marker"
-                } 
-                onClick={handleClick}
-                style={{color: s.color}}
-              >
-                <MdSchool />
-              </div>
-            );
-          }
-          const rootMarker = ReactDOM.createRoot(el)
-          rootMarker.render(<MarkerDiv />);
-
-          marker.setLngLat(coords).addTo(map.current);
-          map.current.flyTo({
-            center: centerMarker, 
-            zoom: 17,
-            duration: 5000,
-            essential: true
-          });
-        });
+      let centerMarker;
+      if (locationsDict[s.location]) {centerMarker = locationsDict[s.location];}
+      else {
+        const response_obj = await fetch(sURL);
+        const res = await response_obj.json();
+        centerMarker = res.features[0].center;
       }
-  });
+      let coords = centerMarker;
+      const str = centerMarker.toString();
+      let i = 0;
+      if (coordCount.has(str)) {i = coordCount.get(str);}
+      coords = [coords[0] + r * Math.sin(theta[i]), coords[1] + r * Math.cos(theta[i])];
+      const newCoordCount = new Map(coordCount).set(str, i + 1);
+      setCoordCount(newCoordCount);
+
+      const el = document.createElement("div");
+      const marker = new mapboxgl.Marker(el);
+
+      function MarkerDiv() {
+        const forceUpdate = useReducer(x => x + 1, 0)[1];
+        const clicked = clickedStore.getState();
+
+        function handleClick() {
+          handleMarkerClick(s, centerMarker);
+          drawPath();
+        }
+
+        function removeMarker() {
+          const clicked = clickedStore.getState();
+          marker.remove();
+          setSelected(selected => selected.filter(e => e.key !== s.key));
+          clickedStore.dispatch({
+            type: "setClicked",
+            payload: clicked.filter(e => e[0].key !== s.key)
+          });
+          const paths = pathsStore.getState();
+          let copy = paths;
+          for (const p of paths) {
+            if (p[0].includes(s.name)) {
+              map.current.removeLayer(p[0]);
+              map.current.removeSource(p[0]);
+              copy = copy.filter(x => x[0] !== p[0]);
+            }
+          }
+          pathsStore.dispatch({type: "setPaths", payload: copy});
+        }
+
+        useEffect(() => {
+          clickedStore.subscribe(forceUpdate);
+          const divMap = divStore.getState();
+          divStore.dispatch({
+            type: "setDivMap",
+            payload: {...divMap, [s.key]: [handleClick, removeMarker]}
+          });
+        }, []);
+
+        return (
+          <div 
+            className={
+              clicked.some(el => el[0].key === s.key) ? "marker-clicked" : "marker"
+            } 
+            onClick={handleClick}
+            style={{color: s.color}}
+          >
+            <MdSchool />
+          </div>
+        );
+      }
+      const rootMarker = ReactDOM.createRoot(el)
+      rootMarker.render(<MarkerDiv />);
+
+      marker.setLngLat(coords).addTo(map.current);
+      map.current.flyTo({
+        center: centerMarker, 
+        zoom: 17,
+        duration: 5000,
+        essential: true
+      });
+    }
+  }
+
+  useEffect(() => {effectFunc();});
  
-  return <div ref={mapContainer} style={{height: "100%"}} />;
+  return <><div ref={mapContainer} style={{height: "100%"}} /></>;
 }

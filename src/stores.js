@@ -26,4 +26,17 @@ function divReducer(divMap = initDivMap, action) {
 
 const divStore = createStore(divReducer);
 
-export { clickedStore, divStore }
+const initPaths = []
+
+function pathReducer(paths = initPaths, action) {
+  switch (action.type) {
+    case 'setPaths':
+      return action.payload;
+    default:
+      return paths
+  }
+}
+
+const pathsStore = createStore(pathReducer);
+
+export { clickedStore, divStore, pathsStore }

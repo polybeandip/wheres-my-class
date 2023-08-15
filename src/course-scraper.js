@@ -24,6 +24,15 @@ for (const s of subjects) {
 }
 loadingPara.innerHTML = "All done!";
 
+const badPlaces = 
+  [
+    "Virtual",
+    "Wolpe Centre",
+    "Bloomberg Center",
+    "Tata Innovation Center",
+    "Green Greenhouse Bldg G"
+  ]
+
 const classes = []
 for (const c of classesJSON) {
   const item = {
@@ -41,7 +50,7 @@ for (const c of classesJSON) {
           room: m.facilityDescr,
           type: s.ssrComponent
         }
-        if (!place.bldg) continue;
+        if (!place.bldg || badPlaces.includes(place.bldg)) continue;
         if (!item.locations.some(el => 
           el.bldg === place.bldg && el.room === place.room
         )) {

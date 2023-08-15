@@ -20,12 +20,12 @@ h1 {
 #container {
   display: grid;
   height: 100%;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 3.5fr;
 }
 
 #search {
   left:50%;
-  margin-left:-10rem;
+  margin-left:-5rem;
   top: 10px;
   width: 40rem;
   position: absolute;

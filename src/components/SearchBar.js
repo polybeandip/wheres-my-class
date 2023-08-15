@@ -18,6 +18,8 @@ const colors =
   ]
 
 function SearchResults({ results, setSelected, selected, setResults }) {
+  const maxClasses = 6;
+
   function contains(lst, obj) {
     return lst.some(elem => elem.key === obj.key);
   } 
@@ -36,7 +38,7 @@ function SearchResults({ results, setSelected, selected, setResults }) {
       c = {...c, location: r.locations[0].bldg, drawn_on_map: false};
       const key = c.name + ", " + c.location + ", " + c.room;
       c = {...c, key: key};
-      if (selected.length > 7 || contains(selected,c)) return;
+      if (selected.length >= maxClasses || contains(selected,c)) return;
       c = {...c, color: findColor()};
       setSelected(selected.concat(c));
       setResults([]);

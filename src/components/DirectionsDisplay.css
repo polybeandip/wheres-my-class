@@ -1,0 +1,20 @@
+#directions-container h1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+#directions-container ul {
+  padding: 10px;
+  margin: 10px;
+}
+
+#left, #right {
+  font-size: 1.3rem
+}
+
+#fromto {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}

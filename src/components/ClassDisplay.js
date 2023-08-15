@@ -1,5 +1,5 @@
 import './ClassDisplay.css'
-import { divStore, clickedStore } from '../stores';
+import { divStore, clickedStore, pathsStore } from '../stores';
 import { useReducer, useEffect } from 'react';
 import { HiTrash } from 'react-icons/hi';
 
@@ -23,9 +23,7 @@ export default function ClassDisplay({ selected }) {
     return (
       <li 
         className={
-          clicked.some(el => 
-            el[0] === x.name && el[2] === x.location && el[3] === x.room) 
-          ? "clicked" : ""
+          clicked.some(el => el[0].key === x.key) ? "clicked" : ""
         } 
         key={x.key} 
         onClick={handleClick}
@@ -46,9 +44,23 @@ export default function ClassDisplay({ selected }) {
 
   return (
   <div>
-    <h1>Classes</h1>
+    {selected.length > 0 ? <h1>Classes</h1> : <h1>Look up a class</h1>}
+    <div id="eli5">
+      {
+        selected.length > 0 ?
+        <>
+          <p>Look up another class</p>
+          <p> 
+            OR click on two class markers or cards to draw the path between them.
+          </p>
+        </>
+        :
+        <p>Use the search bar to look up a class.</p>
+      }
+    </div>
     <ul id="class-display">
       {lis}
+      {pathsStore.getState().length > 0 && <hr id="line"/> }
     </ul>
   </div>
   );

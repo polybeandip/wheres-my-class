@@ -1,11 +1,12 @@
 import './App.css';
 import { useState } from 'react';
-import classes from './course-scraper';
+//import classes from './course-scraper';
 import Map from './components/MapBox';
 import SearchBar from './components/SearchBar';
 import ClassDisplay from './components/ClassDisplay';
+import DirectionsDisplay from './components/DirectionsDisplay';
 
-/* const classes = [
+const classes = [
   {
     code: 'CS 3110',
     title: 'Functional Programming',
@@ -20,23 +21,20 @@ import ClassDisplay from './components/ClassDisplay';
     desc: 'REEEEEE',
     locations: [{bldg: 'Albert R Mann Library', room: 'Mann 105', type:'LEC'}],
   }
-] */
+] 
 
 export default function App() {
   const [selected, setSelected] = useState([]);
 
   return (
     <div id="App">
-      <div id="container" className="grid-expanded">
+      <div id="container">
         <div id="sidebar">
-          <h1>How it works</h1>
-          <p>
-            What is going on here?
-          </p>
           <ClassDisplay 
             selected={selected} 
             setSelected={setSelected}
           />
+          <DirectionsDisplay />
         </div>
         <div>
         <div id="search">
