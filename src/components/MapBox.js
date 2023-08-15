@@ -111,11 +111,10 @@ export default function MapBox({ selected, setSelected }) {
         const vis = 
          () => {map.current.setLayoutProperty(label, 'visibility', 'visible');}
 
-        const paths = pathsStore.getState();
         pathsStore.dispatch({
-          type: "setPaths",
-          payload: paths.concat([[label, data, invis, vis]])
-        })
+          type: "addPath",
+          payload: [label, data, invis, vis]
+        });
         clickedStore.dispatch({type: "setClicked", payload: []});
       });
   }

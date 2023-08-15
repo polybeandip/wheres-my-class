@@ -23,12 +23,12 @@
 }
 
 #trash-icon {
-  transition: all 0.5s ease 0s;
+  transition: all 0.3s ease 0s;
   font-size: 1.3rem;
 }
 
 #trash-icon:hover {
-  color: rgb(130, 0, 0);
+  color: rgb(185, 4, 4);
 }
 
 .color {

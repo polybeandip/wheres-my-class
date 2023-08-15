@@ -10,11 +10,19 @@
 }
 
 #left, #right {
-  font-size: 1.3rem
+  font-size: 1.3rem;
+  transition: all 0.3s ease 0s;
 }
 
-#fromto {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+#left:hover, #right:hover {
+  font-size: 1.65rem;
+  color: blue;
+}
+
+#eli5-arrows {
+  padding: 2px;
+  color: grey;
+  font-size: 0.9rem;
+  margin-top: -5px;
+  padding-bottom: 10px;
 }

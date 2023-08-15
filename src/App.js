@@ -1,12 +1,12 @@
 import './App.css';
 import { useState } from 'react';
-//import classes from './course-scraper';
+import classes from './course-scraper';
 import Map from './components/MapBox';
 import SearchBar from './components/SearchBar';
 import ClassDisplay from './components/ClassDisplay';
 import DirectionsDisplay from './components/DirectionsDisplay';
 
-const classes = [
+/* const classes = [
   {
     code: 'CS 3110',
     title: 'Functional Programming',
@@ -21,7 +21,7 @@ const classes = [
     desc: 'REEEEEE',
     locations: [{bldg: 'Albert R Mann Library', room: 'Mann 105', type:'LEC'}],
   }
-] 
+] */
 
 export default function App() {
   const [selected, setSelected] = useState([]);

@@ -1,27 +1,35 @@
 import './DirectionsDisplay.css';
 import { pathsStore } from '../stores';
-import { useState, useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 
 
 export default function DirectionsDisplay() {
-  const [index, setIndex] = useState(0);
-  const paths = pathsStore.getState();
+  const {index, paths} = pathsStore.getState();
 
   const forceUpdate = useReducer(x => x + 1, 0)[1];
   useEffect(() => {pathsStore.subscribe(() => {
-    const paths = pathsStore.getState();
-    setIndex(paths.length -1);
-    if(paths.length != 1) {paths[index][2]();}
     forceUpdate();
+    const {paths, index, lastAction} = pathsStore.getState();
+    if (lastAction !== 'addPath') return;
+    if (index !== paths.length - 1) {
+      paths[index][2]();
+      pathsStore.dispatch({type: 'setIndex', payload: paths.length - 1});
+    } 
   });}, []);
 
   if(paths.length === 0) return;
 
+  if (index > paths.length - 1) {
+    pathsStore.dispatch({type: 'setIndex', payload: paths.length - 1});
+    return;
+  }
+
   function changeIndex(newdex) {
+    const index = pathsStore.getState().index;
     paths[index][2](); //make current path invis
     paths[newdex][3](); //make new path vis
-    setIndex(newdex);
+    pathsStore.dispatch({type: 'setIndex', payload: newdex});
   }
 
   function leftClick() {
@@ -44,7 +52,8 @@ export default function DirectionsDisplay() {
         Directions 
         {paths.length > 1 && <div id="right" onClick={rightClick}><AiOutlineRight /></div>}
       </h1>
-      <div id="#fromto">{data.origin.code} to {data.destination.code}</div>
+      {paths.length > 1 && <p id="eli5-arrows">Use the arrows to switch paths</p>}
+      <div>{data.origin.code} to {data.destination.code}</div>
       <div>duration: {data.duration} seconds</div> 
       <div>distance: {paths[index][1].distance} meters</div>
       <ul>

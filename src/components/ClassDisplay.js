@@ -49,18 +49,18 @@ export default function ClassDisplay({ selected }) {
       {
         selected.length > 0 ?
         <>
-          <p>Look up another class</p>
+          <p>Search for a class</p>
           <p> 
-            OR click on two class markers or cards to draw the path between them.
+            OR select two class icons (on the map or sidebar) to show the walking route between them
           </p>
         </>
         :
-        <p>Use the search bar to look up a class.</p>
+        <p>Use the search bar to look for a class.</p>
       }
     </div>
     <ul id="class-display">
       {lis}
-      {pathsStore.getState().length > 0 && <hr id="line"/> }
+      {pathsStore.getState().paths.length > 0 && <hr id="line"/> }
     </ul>
   </div>
   );
