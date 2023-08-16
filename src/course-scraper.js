@@ -44,7 +44,6 @@ for (const c of classesJSON) {
   }
   for (const e of c.enrollGroups) {
     for (const s of e.classSections) {
-      
       for (const m of s.meetings) {
         const place = {
           bldg: m.bldgDescr,
@@ -56,7 +55,7 @@ for (const c of classesJSON) {
         }
         if (!place.bldg || badPlaces.includes(place.bldg)) continue;
         if (!item.locations.some(el => 
-          el.bldg === place.bldg && el.room === place.room
+          el.room === place.room && el.type === place.type && el.time === place.time && el.days === place.days
         )) {
           item.locations.push(place);
         }

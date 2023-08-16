@@ -57,12 +57,13 @@ function SearchResults({ results, setSelected, selected, setResults }) {
       const newResults = r.locations.map(l => {
         const d = letterToDay[l.days] ? letterToDay[l.days] : l.days;
         return {
-        name: l.typeLong + " on " + d + " at " + l.time,
-        type: l.type,
-        locations: [l],
-        room: l.room,
-        class: r
-      }});
+          name: l.typeLong + " on " + d + " at " + l.time + " (" + l.room + ")",
+          type: l.type,
+          locations: [l],
+          room: l.room,
+          class: r
+        }
+      });
       setResults(newResults);
     }
   }
