@@ -44,11 +44,15 @@ for (const c of classesJSON) {
   }
   for (const e of c.enrollGroups) {
     for (const s of e.classSections) {
+      
       for (const m of s.meetings) {
         const place = {
           bldg: m.bldgDescr,
           room: m.facilityDescr,
-          type: s.ssrComponent
+          type: s.ssrComponent,
+          typeLong: s.ssrComponentLong,
+          time: m.timeStart,
+          days: m.pattern
         }
         if (!place.bldg || badPlaces.includes(place.bldg)) continue;
         if (!item.locations.some(el => 

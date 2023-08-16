@@ -17,6 +17,16 @@ const colors =
     "pink"
   ]
 
+const letterToDay = {
+  'M': 'Monday',
+  'T': 'Tuesday',
+  'W': 'Wednesday',
+  'R': 'Thursday',
+  'F': 'Friday',
+  'S': 'Saturday',
+  'Su': 'Sunday'
+}
+
 function SearchResults({ results, setSelected, selected, setResults }) {
   const maxClasses = 6;
 
@@ -33,8 +43,8 @@ function SearchResults({ results, setSelected, selected, setResults }) {
   function handleClick(r, showArrow) {
     if (!showArrow) {
       let c;
-      if (r.class) {c = {...r.class, room: r.room}}
-      else {c = {...r, room: r.locations[0].room}}
+      if (r.class) {c = {...r.class, room: r.room, code: r.class.code + " (" + r.type + ")"};}
+      else {c = {...r, room: r.locations[0].room};}
       c = {...c, location: r.locations[0].bldg, drawn_on_map: false};
       const key = c.name + ", " + c.location + ", " + c.room;
       c = {...c, key: key};
@@ -44,8 +54,11 @@ function SearchResults({ results, setSelected, selected, setResults }) {
       setResults([]);
     }
     else {
-      const newResults = r.locations.map(l => {return {
-        name: l.room + " (" + l.type + ")",
+      const newResults = r.locations.map(l => {
+        const d = letterToDay[l.days] ? letterToDay[l.days] : l.days;
+        return {
+        name: l.typeLong + " on " + d + " at " + l.time,
+        type: l.type,
         locations: [l],
         room: l.room,
         class: r

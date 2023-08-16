@@ -1,2 +1,2 @@
 lines: 
-	cloc --by-file --exclude-dir=node_modules, --exclude-list-file=lstfile .
+	cloc --by-file --exclude-dir=node_modules,build --exclude-list-file=lstfile .
