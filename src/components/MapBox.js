@@ -37,6 +37,10 @@ export default function MapBox({ selected, setSelected }) {
   //other state
   const [coordCount, setCoordCount] = useState(new Map());
 
+  function removeClicked() {
+    clickedStore.dispatch({type: "setClicked", payload: []});
+  }
+
   function handleMarkerClick(s, centerMarker) {
     const clicked = clickedStore.getState();
     if (!clicked.some(el => el[0].key === s.key)) {
@@ -44,6 +48,9 @@ export default function MapBox({ selected, setSelected }) {
         type: "setClicked", 
         payload: clicked.concat([[s, centerMarker]])
       });
+    }
+    else {
+      removeClicked();
     }
   }
 
@@ -58,10 +65,7 @@ export default function MapBox({ selected, setSelected }) {
     const label = oclass.name + " to " + dclass.name;
 
     if (start.toString() === stop.toString() || map.current.getLayer(label)) {
-      clickedStore.dispatch({
-        type: "setClicked",
-        payload: []
-      });
+      removeClicked();
       return;
     }
 
@@ -72,6 +76,8 @@ export default function MapBox({ selected, setSelected }) {
       "&overview=full" + 
       "&steps=true"+
       "&access_token=" + mapboxgl.accessToken;
+
+    console.log(url);
 
     fetch(url)
       .then(res => res.json())
@@ -110,12 +116,22 @@ export default function MapBox({ selected, setSelected }) {
 
         const vis = 
          () => {map.current.setLayoutProperty(label, 'visibility', 'visible');}
+        
+        const del = () => {
+          map.current.removeLayer(label); 
+          map.current.removeSource(label);
+          const {paths} = pathsStore.getState()
+          pathsStore.dispatch({
+            type: "setPaths",
+            payload: paths.filter(p => p[0] !== label)
+          });
+        }
 
         pathsStore.dispatch({
           type: "addPath",
-          payload: [label, data, invis, vis]
+          payload: [label, data, invis, vis, del]
         });
-        clickedStore.dispatch({type: "setClicked", payload: []});
+        removeClicked();
       });
   }
 
@@ -200,7 +216,7 @@ export default function MapBox({ selected, setSelected }) {
             type: "setClicked",
             payload: clicked.filter(e => e[0].key !== s.key)
           });
-          const paths = pathsStore.getState();
+          const paths = pathsStore.getState().paths;
           let copy = paths;
           for (const p of paths) {
             if (p[0].includes(s.name)) {
@@ -226,7 +242,7 @@ export default function MapBox({ selected, setSelected }) {
             className={
               clicked.some(el => el[0].key === s.key) ? "marker-clicked" : "marker"
             } 
-            onClick={handleClick}
+            onClick={e => {e.stopPropagation(); handleClick();}}
             style={{color: s.color}}
           >
             <MdSchool />
@@ -248,5 +264,5 @@ export default function MapBox({ selected, setSelected }) {
 
   useEffect(() => {effectFunc();});
  
-  return <><div ref={mapContainer} style={{height: "100%"}} /></>;
+  return <div ref={mapContainer} style={{height: "100%"}} onClick={removeClicked}/>;
 }

@@ -19,7 +19,7 @@ import DirectionsDisplay from './components/DirectionsDisplay';
     title: 'Not Func Programming and other shit homie',
     name: 'CS 3111: Not Func Programming',
     desc: 'REEEEEE',
-    locations: [{bldg: 'Albert R Mann Library', room: 'Mann 105', type:'LEC'}],
+    locations: [{bldg: 'Albert R Mann Library', room: 'Mann 105 Some more text just so that it goes on to the next', type:'LEC'}],
   }
 ] */
 

@@ -32,3 +32,13 @@ h1 {
   z-index: 1;
   background: white
 }
+
+/* for ClassDisplay and DirectionsDisplay */
+#trash-icon {
+  transition: all 0.3s ease 0s;
+  font-size: 1.3rem;
+}
+
+#trash-icon:hover {
+  color: rgb(185, 4, 4);
+}

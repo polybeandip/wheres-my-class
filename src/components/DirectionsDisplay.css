@@ -5,8 +5,29 @@
 }
 
 #directions-container ul {
-  padding: 10px;
-  margin: 10px;
+  padding: 0px 20px;
+  list-style-type: none;
+}
+
+#directions-container li {
+  margin: 15px 0px;
+}
+
+fieldset {
+  border: 0;
+  border-top: 1px solid grey;
+  transform: rotate(180deg); 
+}
+
+fieldset > legend {
+  transform: rotate(180deg);
+  margin: auto;
+  font-size: 0.8rem;
+  color: grey;
+}
+
+.direction {
+  padding-bottom: 5px;
 }
 
 #left, #right {
@@ -25,4 +46,22 @@
   font-size: 0.9rem;
   margin-top: -5px;
   padding-bottom: 10px;
+  padding-left: 0px;
+}
+
+#from-to {
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#time {
+  font-size: 1.4rem;
+  padding: 10px;
+  padding-top: 0px
+}
+
+#time span {
+  color: grey;
 }

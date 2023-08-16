@@ -49,13 +49,13 @@ export default function ClassDisplay({ selected }) {
       {
         selected.length > 0 ?
         <>
-          <p>Search for a class</p>
+          <p>Search for another class</p>
           <p> 
-            OR select two class icons (on the map or sidebar) to show the walking route between them
+            OR select two class icons (on the map or sidebar) to show the route between them
           </p>
         </>
         :
-        <p>Use the search bar to look for a class.</p>
+        <p>Use the search bar to look for a class</p>
       }
     </div>
     <ul id="class-display">
