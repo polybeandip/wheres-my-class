@@ -8,6 +8,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import locationsDict from '../locations.json';
 
 // fix for map not showing up after npm build
+//@ts-ignore
+//eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
 const theta = 
