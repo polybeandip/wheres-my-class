@@ -1,6 +1,6 @@
 import './App.css';
 import { useState } from 'react';
-import classes from './course-scraper';
+import classes from './classes.json';
 import Map from './components/MapBox';
 import SearchBar from './components/SearchBar';
 import ClassDisplay from './components/ClassDisplay';

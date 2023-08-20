@@ -28,7 +28,7 @@ const letterToDay = {
 }
 
 function SearchResults({ results, setSelected, selected, setResults }) {
-  const maxClasses = 6;
+  const maxClasses = 8;
 
   function contains(lst, obj) {
     return lst.some(elem => elem.key === obj.key);
