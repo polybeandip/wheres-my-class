@@ -67,7 +67,7 @@ export default function MapBox({ selected, setSelected }) {
     const stop = clicked[1][1];
     const oclass = clicked[0][0];
     const dclass = clicked[1][0];
-    const label = oclass.name + " to " + dclass.name;
+    const label = oclass.key + " to " + dclass.key;
 
     if (start.toString() === stop.toString() || map.current.getLayer(label)) {
       removeClicked();
@@ -81,8 +81,6 @@ export default function MapBox({ selected, setSelected }) {
       "&overview=full" + 
       "&steps=true"+
       "&access_token=" + mapboxgl.accessToken;
-
-    console.log(url);
 
     fetch(url)
       .then(res => res.json())

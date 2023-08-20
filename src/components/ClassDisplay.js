@@ -35,7 +35,7 @@ export default function ClassDisplay({ selected }) {
         <div className="content">
           <p className="title"><b className="code">{x.code}</b> {" " + x.title}</p>
           <p className="loc">
-            {x.room} 
+            {x.room + (x.dt ? " (" + x.dt + ")" : "")} 
             <span id="trash-icon" onClick={del}>
               <HiTrash />
             </span>

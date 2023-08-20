@@ -9,12 +9,10 @@ const colors =
     "green",
     "blue",
     "orange",
-    "yellow",
     "purple",
     "violet",
-    "indigo",
-    "cyan",
-    "pink"
+    "chocolate",
+    "hotpink"
   ]
 
 const letterToDay = {
@@ -43,10 +41,17 @@ function SearchResults({ results, setSelected, selected, setResults }) {
   function handleClick(r, showArrow) {
     if (!showArrow) {
       let c;
-      if (r.class) {c = {...r.class, room: r.room, code: r.class.code + " (" + r.type + ")"};}
+      if (r.class) {
+        c = {
+          ...r.class, 
+          room: r.room, 
+          code: r.class.code + " (" + r.type + ")", 
+          dt: r.dt
+        };
+      }
       else {c = {...r, room: r.locations[0].room};}
       c = {...c, location: r.locations[0].bldg, drawn_on_map: false};
-      const key = c.name + ", " + c.location + ", " + c.room;
+      const key = c.name + ", " + c.room + (c.dt ? ", " + c.dt : "");
       c = {...c, key: key};
       if (selected.length >= maxClasses || contains(selected,c)) return;
       c = {...c, color: findColor()};
@@ -58,6 +63,7 @@ function SearchResults({ results, setSelected, selected, setResults }) {
         const d = letterToDay[l.days] ? letterToDay[l.days] : l.days;
         return {
           name: l.typeLong + " on " + d + " at " + l.time + " (" + l.room + ")",
+          dt: l.days + " " + l.time,
           type: l.type,
           locations: [l],
           room: l.room,
