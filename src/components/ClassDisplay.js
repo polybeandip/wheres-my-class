@@ -5,7 +5,10 @@ import { HiTrash } from 'react-icons/hi';
 
 export default function ClassDisplay({ selected }) {
   const forceUpdate = useReducer(x => x + 1, 0)[1];
-  useEffect(() => {clickedStore.subscribe(forceUpdate);}, []);
+  useEffect(() => {
+    clickedStore.subscribe(forceUpdate); 
+    pathsStore.subscribe(forceUpdate);
+  }, []);
 
   const lis = selected.map(x => {
     const clicked = clickedStore.getState();
