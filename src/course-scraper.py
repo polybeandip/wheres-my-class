@@ -55,5 +55,5 @@ for c in classesJSON:
   if len(item['locations']) > 0: 
     classes.append(item)
 
-with open('classes.json', 'w') as f:
+with open('./src/classes.json', 'w') as f:
     json.dump(classes, f)
