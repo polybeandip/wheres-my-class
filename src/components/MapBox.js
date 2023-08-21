@@ -28,8 +28,7 @@ const theta =
 
 const r = 0.000025;
 
-//please don't steal this
-mapboxgl.accessToken = "pk.eyJ1IjoicG9seWJlYW5kaXAiLCJhIjoiY2xrd2ZlbW94MDJ6dDNwdDQweWQyZnVsZCJ9.7L7RWu5Du9O0ZDxO8aXQow"
+mapboxgl.accessToken = process.env.REACT_APP_MAP_BOX_TOKEN;
 
 export default function MapBox({ selected, setSelected }) {
   //for the map
