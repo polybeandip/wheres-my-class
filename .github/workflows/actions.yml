@@ -34,12 +34,14 @@ jobs:
         git commit -m "update classes.json"
 
     - name: push changes
+      if: success() || failure()
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: main 
 
     - name: setup node.js ${{ matrix.node-version }}
+      if: success() || failure()
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
