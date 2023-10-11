@@ -5,7 +5,10 @@ def grab_json(url):
   return json.loads(requests.get(url).text)
 
 rosterURL = "https://classes.cornell.edu/api/2.0/config/rosters.json"
-roster = grab_json(rosterURL)['data']['rosters'][-1]['slug']
+rosters = grab_json(rosterURL)['data']['rosters']
+roster = rosters[-1]['slug']
+if "WI" in roster or "SU" in roster:
+  roster = rosters[-2]['slug']
 
 subjectsURL = "https://classes.cornell.edu/api/2.0/config/subjects.json?roster="+roster
 subjects = grab_json(subjectsURL)['data']['subjects']
